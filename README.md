@@ -1,6 +1,8 @@
 # FWC SwiftUI Skills
 
-Cursor Agent Skills for modern SwiftUI development on iOS 26+.
+Agent Skills for modern SwiftUI development on iOS 26+.
+
+Works in Cursor, Codex, Claude Code, and any other harness that supports the [Agent Skills](https://agentskills.io) format.
 
 Maintained by [FloWritesCode](https://github.com/FloWritesCode).
 
@@ -16,12 +18,16 @@ npx skills add FloWritesCode/fwc-swiftui-skills
 npx skills add FloWritesCode/fwc-swiftui-skills --skill swiftui-liquid-glass
 ```
 
-Manual install for a single skill:
+The [skills CLI](https://github.com/vercel-labs/skills) copies skills into the directories used by Cursor, Claude Code, Codex, and other supported agents.
+
+Manual install for a single skill — copy the folder into your agent's skills directory:
 
 ```bash
 git clone https://github.com/FloWritesCode/fwc-swiftui-skills.git
-cp -R fwc-swiftui-skills/skills/swiftui-liquid-glass ~/.cursor/skills/
+cp -R fwc-swiftui-skills/skills/swiftui-liquid-glass ~/.agents/skills/
 ```
+
+Examples: `~/.cursor/skills/` (Cursor), `~/.claude/skills/` (Claude Code), `~/.codex/skills/` (Codex), `~/.agents/skills/` (universal / others).
 
 Requires Xcode with the iOS 26 SDK for Liquid Glass APIs.
 
@@ -46,7 +52,7 @@ fwc-swiftui-skills/
         └── reference.md   # optional
 ```
 
-Follow the [Agent Skills](https://cursor.com/docs/context/skills) format: each skill is a directory with a `SKILL.md` frontmatter (`name`, `description`).
+Follow the [Agent Skills](https://agentskills.io/specification) format: each skill is a directory with a `SKILL.md` frontmatter (`name`, `description`).
 
 ## Adding a skill
 
