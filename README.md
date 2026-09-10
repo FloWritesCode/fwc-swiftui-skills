@@ -30,6 +30,7 @@ Requires Xcode with the iOS 26 SDK for Liquid Glass APIs.
 | Skill | Description |
 |-------|-------------|
 | [**swiftui-liquid-glass**](skills/swiftui-liquid-glass/) | Implement and review iOS 26+ Liquid Glass with native APIs, common patterns, and pitfalls |
+| [**swiftui-iphone-duo**](skills/swiftui-iphone-duo/) | Adapt SwiftUI apps for iPhone Duo: size-based layout, fold-safe content, hinge interactions, and second-display accessories |
 
 More skills will be added here as separate folders under `skills/`.
 
