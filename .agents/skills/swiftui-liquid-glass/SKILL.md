@@ -4,7 +4,8 @@ description: >-
   Implement, review, and refactor SwiftUI features using the iOS 26+ Liquid Glass
   API. Use when adopting Liquid Glass in new UI, converting existing surfaces to
   glass, reviewing glass usage for correctness, or fixing common Liquid Glass
-  pitfalls (custom blur stacks, scroll views, button shapes, bottom bars).
+  pitfalls (custom blur stacks, scroll views, button shapes, bottom bars,
+  pre-enclosed symbols).
 ---
 
 # SwiftUI Liquid Glass
@@ -22,6 +23,7 @@ Use native Liquid Glass APIs on iOS 26+. Do not recreate the effect with materia
 7. **Scrolling**: avoid using liquid glass inside ScrollView and List (anything that scrolls).
 8. **Bottom bars**: when anchoring a liquid glass View to the bottom of the screen, prefer embedding it in `.safeAreaBar(.bottom)` instead of a VStack or `.overlay()`. safeAreaBar adds a subtle blur effect behind its content.
 9. **Toolbar items — no glass**: on iOS 26+, navigation bar and window toolbar items get a shared Liquid Glass background by default. For items that should **not** show the glass capsule (plain icons, custom labels, status text, logos), apply `.sharedBackgroundVisibility(.hidden)` on the **`ToolbarItem`**, not on the inner view.
+10. **SF Symbols — no pre-enclosed symbols**: do not use pre-enclosed SF Symbol variants (such as `plus.circle`, `xmark.circle.fill`, or `trash.circle`) inside Liquid Glass buttons or containers. The glass shape already acts as the container; pre-enclosed symbols create an awkward "double enclosure" (a circle inside a circle). Use base/unenclosed symbols (`plus`, `xmark`, `trash`) and let `.buttonBorderShape()` or the glass container define the enclosing shape.
 
 ## Decision tree
 
@@ -29,6 +31,9 @@ Use native Liquid Glass APIs on iOS 26+. Do not recreate the effect with materia
 Need a button?
 ├─ Neutral / secondary → .buttonStyle(.glass)
 └─ Tinted / primary    → .buttonStyle(.glassProminent).tint(someColor)
+
+Icon in a glass button / surface?
+└─ Plain unenclosed symbol (e.g. "plus", not "plus.circle") — glass provides enclosure
 
 Need a custom non-button surface (chip, badge, card)?
 └─ .glassEffect(.regular, in: shape) on the view content
@@ -57,6 +62,7 @@ Inside ScrollView, List, or Form rows?
 - Flag glass inside scrollable containers.
 - Check bottom-anchored bars use `.safeAreaBar(.bottom)`.
 - Check toolbar items that should appear without glass use `.sharedBackgroundVisibility(.hidden)` on the `ToolbarItem`.
+- Flag pre-enclosed SF Symbols (e.g. circle/square variants) inside glass buttons or surfaces.
 - Gate with `#available(iOS 26, *)` and provide fallbacks.
 
 ### 2) Implement or refactor
@@ -65,7 +71,8 @@ Inside ScrollView, List, or Form rows?
 2. Apply layout and typography first; add glass modifiers last.
 3. Wrap adjacent glass elements in `GlassEffectContainer`.
 4. Account for ~13pt internal button padding when matching designs.
-5. Add iOS 26 availability checks and pre-26 fallbacks.
+5. Use unenclosed SF Symbols so the glass shape provides the enclosing geometry.
+6. Add iOS 26 availability checks and pre-26 fallbacks.
 
 ## Patterns
 
@@ -98,6 +105,24 @@ Button { action() } label: {
 Button("Save") { action() }
     .buttonStyle(.glassProminent)
     .buttonBorderShape(.capsule)
+```
+
+Do **not** use pre-enclosed SF Symbols inside glass buttons:
+
+```swift
+// ❌ Wrong — pre-enclosed symbol creates redundant double enclosure
+Button { add() } label: {
+    Image(systemName: "plus.circle.fill")
+}
+.buttonStyle(.glass)
+.buttonBorderShape(.circle)
+
+// ✅ Right — plain symbol, glass shape provides the enclosure
+Button { add() } label: {
+    Image(systemName: "plus")
+}
+.buttonStyle(.glass)
+.buttonBorderShape(.circle)
 ```
 
 ### Custom glass surfaces
@@ -227,6 +252,7 @@ if #available(iOS 26, *) {
 | Multiple glass views without container | No merge effect, worse rendering | `GlassEffectContainer` |
 | Glass capsule on toolbar items that should be bare | iOS 26 adds shared glass to toolbar groupings by default | `.sharedBackgroundVisibility(.hidden)` on the `ToolbarItem` |
 | `.sharedBackgroundVisibility` on inner view | Does not remove toolbar glass background | Apply on `ToolbarItem` (or other `ToolbarContent`) |
+| Pre-enclosed SF Symbols in glass buttons (`plus.circle`, `xmark.circle.fill`) | Redundant double enclosure ("circle in circle"); clashes with glass shape | Use unenclosed symbol (`plus`, `xmark`) and let `.buttonBorderShape` provide the container |
 
 ## Review checklist
 
@@ -238,6 +264,7 @@ if #available(iOS 26, *) {
 - [ ] No glass inside scroll views
 - [ ] Bottom chrome uses `.safeAreaBar(.bottom)`
 - [ ] Toolbar items without glass use `.sharedBackgroundVisibility(.hidden)` on `ToolbarItem`
+- [ ] No pre-enclosed SF Symbols in glass buttons (e.g. "plus" instead of "plus.circle")
 - [ ] `#available(iOS 26, *)` with fallback on older OS
 
 ## Additional resources

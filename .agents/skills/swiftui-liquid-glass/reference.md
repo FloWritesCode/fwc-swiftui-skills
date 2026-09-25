@@ -37,6 +37,7 @@ Native glass buttons include ~13pt internal padding. When matching Figma or fixe
 - Measure the **outer** glass bounds, not just label text size.
 - Prefer letting the button style size itself; avoid stacking extra `.padding()` on the label.
 - Use `.buttonBorderShape(.roundedRectangle(radius:))` to match design corner radius without clipping content.
+- Avoid pre-enclosed SF Symbols (`.circle`, `.square`); the button's glass border shape already serves as the container.
 
 ```swift
 Button("Continue") { next() }
